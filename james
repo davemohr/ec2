@@ -1,0 +1,99 @@
+### START EMAIL SERVER SECTION ###
+# Acquire james email server
+JAMESINSTALLER=/var/tmp/deployments/repo-admin/apache-james-2.3.2.zip 
+if [ ! -e $JAMESINSTALLER ]; then
+	# If not found, download 
+	echo "## Warning: $JAMESINSTALLER not found, downloading from S3 repo..."
+	wget -O $JAMESINSTALLER http://foo.s3-website-us-east-1.amazonaws.com/apache-james-2.3.2.zip
+fi
+
+# set postfix service to not start at boot and turn it off now too
+sudo /sbin/chkconfig postfix off
+sudo /sbin/service postfix stop
+
+# configure james email server
+sudo unzip $JAMESINSTALLER -d /opt
+sudo chmod 755 /opt/james-2.3.2/bin/run.sh
+sudo chmod 755 /opt/james-2.3.2/bin/phoenix.sh
+sudo sed -i '6i\JAVA_HOME=/usr/java/jdk1.7.0_67/' /opt/james-2.3.2/bin/run.sh
+
+# install james as a service but leave it off on startup
+sudo sed -i '2i\#chkconfig: 2345 80 05' /opt/james-2.3.2/bin/phoenix.sh
+sudo sed -i '3i\#description: James Mail Server' /opt/james-2.3.2/bin/phoenix.sh
+sudo sed -i '4i\export JAVA_HOME=/usr/java/default' /opt/james-2.3.2/bin/phoenix.sh
+cd /etc/init.d
+sudo ln -s /opt/james-2.3.2/bin/phoenix.sh james
+sudo /sbin/chkconfig --add james
+sudo /sbin/chkconfig james off
+
+#start james once so we the SAR-INF dir is created
+sudo /sbin/service james start
+sleep 15
+
+#now stop it while we edit config.xml
+sudo /sbin/service james stop
+sleep 10
+
+#update the config.xml to lion instead of localhost, otherwise the email server won't work
+#and neither will the telnet session
+sudo sed -i 's|<servername>localhost</servername>|<servername>lion</servername>|' /opt/james-2.3.2/apps/james/SAR-INF/config.xml
+
+#now start it up again for the telnet session
+sudo /sbin/service james start
+sleep 20
+
+# now call the expect script which logs into telnet and creates the training mail user
+sudo chmod +x /var/tmp/deployments/setJamesUser.exp
+sudo chmod +x /var/tmp/deployments/setJamesUser.sh
+cd /var/tmp/deployments
+sudo ./setJamesUser.exp
+sleep 20
+echo "end of 01-05-gnome-user-customizations script"
+### END EMAIL SERVER SECTION ###
+
+#!/bin/sh
+# start James email server which was installed in the "gnome user customizations" script)
+# to create the apps/james dir and file contents
+sudo /sbin/service james start
+sleep 15
+
+#now stop it while we edit config.xml
+sudo /sbin/service james stop
+sleep 10
+
+#update the config.xml to lion instead of localhost, otherwise the email server won't work
+#and neither will the telnet session
+sudo sed -i 's|<servername>localhost</servername>|<servername>lion</servername>|' /opt/james-2.3.2/apps/james/SAR-INF/config.xml
+
+#now start it up again for the telnet session
+sudo /sbin/service james start
+sleep 20
+sudo /sbin/service james stop
+sleep 20
+sudo /sbin/service james start
+sleep 20
+
+# now call the expect script which logs into telnet and creates the training mail user
+sudo chmod +x /var/tmp/deployments/setJamesUser.exp
+sudo chmod +x /var/tmp/deployments/setJamesUser.sh
+echo ifconfig
+cd /var/tmp/deployments
+sudo ./setJamesUser.exp
+sleep 20
+
+
+==============
+setJamesUser.exp
+=========
+#!/usr/bin/expect
+spawn ./setJamesUser.sh
+expect "Login id:" { send "root\r"}
+expect "Password:" { send "root\r"}
+expect "Welcome root. HELP for a list of commands" { send "adduser training training\r"}
+expect "User training added" { send "quit\r"}
+
+==============
+setJamesUser.sh
+=========
+#!/bin/bash
+telnet 127.0.0.1 4555
