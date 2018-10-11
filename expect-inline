@@ -14,3 +14,10 @@ send \"training\r\"
 expect -re \"Would *\"
 send \"n\r\"
 expect eof"
+
+#another example
+expect -c "set timeout -1
+spawn sudo /usr/sbin/update-alternatives --config java
+expect -re \"Enter *\"
+send \"2\r\"
+expect eof"
