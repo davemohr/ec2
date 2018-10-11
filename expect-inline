@@ -1,0 +1,16 @@
+# It must of course be installed
+sudo yum install -y expect 
+
+# This is an example of calling expect from within a shell script.
+# The vncpasswd utility starts asking questions and we offer responses to each one
+
+echo "calling vncpasswd as user"
+	expect -c "set timeout -1
+spawn vncpasswd
+expect -re \"Password *\"
+send \"training\r\"
+expect -re \"Verify *\"
+send \"training\r\"
+expect -re \"Would *\"
+send \"n\r\"
+expect eof"
