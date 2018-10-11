@@ -1,0 +1,28 @@
+# Building the files you need to get the cert
+# Tool to create a new CSR 
+https://www.digicert.com/easy-csr/openssl.htm
+# Fill in cert details, common name can be wildcard (e.g., *.domain.name.com)
+# Key size RSA2048
+# click Generate
+
+# Create a directory on the instance called /home/centos/certs/<newcert> and cd to it.
+# Run the commands below on a centos instance (on any centos machine with openssl installed)
+openssl req -new -newkey rsa:2048 \
+-nodes -out star_foo.csr -keyout star_foo.key \
+-subj "/C=US/ST=California/L=City/O=Company/OU=Dept/CN=*.foo-domain"
+
+# The result is two files: a .csr, and a .key. 
+# You paste the .csr into the https://www.digicert.com/secure/requests/ssl_certificate/ssl_wildcard page. 
+# The page then shows the details contained in the csr. confirm that they look correct.
+
+# After purchase
+# Download the certificate as a .crt file to your laptop which will give you a zip file
+# Scp the .zip file to the machine that contains the cert. 
+# unzip
+# It contains the .crt you need. You will also need the .key files you created before the purchase. 
+
+# Run this type of command to convert the .crt to .pem (which is what Hue needs)
+# adjust the parts of the command that are in red below to match your new files:
+
+# Also, copy the .key file so that the copy has the .pem extension. Example:
+cp star_foo.key star_foo-key.pem
