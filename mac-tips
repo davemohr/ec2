@@ -1,0 +1,29 @@
+Mac Tips
+
+$ sudo defaults write com.apple.finder AppleShowAllFiles FALSE  # Shows/hides hidden files
+$ open -e file.txt	# open in the default editor
+
+Shirt-Ctrl-Power	# locks the screen
+Fn-Delete					# delete char after (to the right)
+Ctrl-a						# go to the start of the line
+Ctrl-e						# go to the end of the line
+
+Cmd-Shift-4				# screenshot of region
+Cmd-Shift-4-Ctrl	# screenshot of region and save to clipboard (then cmd-space, search "pre" Enter, and cntl-V)
+Option-Cmd-Esc		# show running apps (force quit option)
+open .						# open terminal in pwd
+
+Reset PRAM        - see https://support.apple.com/en-us/HT204063
+
+~/.bash_profile
+------------------
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced
+export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ "
+alias ls='ls -GFh'
+alias sub="'open -a /Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl '"
+function title(){
+	PROMPT_COMMAND='echo -ne "\033]0;'"$1"' '"$2"' '"$3"'\007"'
+}
+export -f title
+------------------
