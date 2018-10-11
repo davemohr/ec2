@@ -1,0 +1,29 @@
+# enable and start the postfix service
+sudo systemctl enable postfix
+sudo systemctl start postfix
+
+# Configure SMTP
+sudo yum install -y mailx
+# sudo mv /etc/postfix/main.cf /tmp #maybe don't do this
+
+# Replace the main.cf in the /etc/postfix dir (chown root:root and chmod 644)
+sudo systemctl restart postfix
+
+# Send a test message:
+echo "email body" | mail -s "test subject line" root@localhost
+
+# Now try to read the email sent to the local machine:
+(logged in as root, or as sudo su - root): # mail
+
+# The above proves postfix is working
+
+# Other notes
+sudo vim /etc/postfix/main.cf
+postmap /etc/postfix/virtual
+sudo systemctl restart postfix
+sudo yum install -y mailx cyrus-sasl cyrus-imapd
+systemctl status cyrus-imapd
+systemctl status Saslauthd
+vim /etc/sasl2/smtpd.conf
+vim /etc/imapd.conf
+testsaslauthd -u cyrus -p password
