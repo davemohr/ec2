@@ -1,7 +1,17 @@
 # Install some libraries
-sudo yum install -y tigervnc-server uuid libvncserver xorg-x11-server-Xvfb \
-libpng12 xorg-x11-fonts-Type1 libXfont cairo-devel libjpeg-turbo-devel \
-libpng-devel uuid-devel maven
+sudo yum install -y \
+tigervnc-server \
+uuid \
+libvncserver \
+xorg-x11-server-Xvfb \
+libpng12 \
+xorg-x11-fonts-Type1 \
+libXfont \
+cairo-devel \
+libjpeg-turbo-devel \
+libpng-devel \
+uuid-devel \
+maven
 
 # Configure VNC
 su - training
