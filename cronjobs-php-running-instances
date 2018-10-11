@@ -1,0 +1,59 @@
+vi /etc/crontab
+# make calls to .sh files from here
+----------------
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/centos/.local/bin:/home/centos/bin
+MAILTO=root
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+ 00 00  *  *  * root cd /home/centos/config && ./cron.sh
+ 00 03  *  *  * root cd /home/centos/config && ./cron.sh
+ 00 06  *  *  * centos cd /home/centos/config && ./new-email-report.sh
+ 30 18  *  *  * centos cd /home/centos/config && ./new-email-report.sh
+----------------
+#this line in a shell script emails people a report
+mail -s "EC2 Running Instances Report" user@domain.com < /home/centos/running-instances/$filename 
+
+---------------
+# Example AWS CLI command - find running instances in a region, and return l
+aws ec2 describe-instances \
+--region us-west-1 \
+--query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value[],PublicIpAddress,LaunchTime,PublicDnsName,PrivateIpAddress]' \
+--filters Name=instance-state-name,Values=running 
+
+# add a user to the passwords file
+sudo htpasswd /usr/local/apache/passwd/passwords username
+# see who is already in the passwords file
+cat /usr/local/apache/passwd/passwords
+# add a user to the groups files
+sudo vim /usr/local/apache/passwd/groups
+
+# Apache HTTPD web server
+sudo systemctl status httpd
+# Main conf file: /etc/httpd/conf/httpd.conf
+# Add basic auth on /var/www/html/foo dir in this file
+# References the internal IP (won't start if this is wrong)
+# Modules dir: /usr/lib64/httpd/modules # If the module is here, you can enable it in httpd.conf
+# Useful Documentation regarding security
+https://httpd.apache.org/docs/2.4/mod/mod_auth_basic.html
+
+# Useful Documentation regarding adding modules
+https://collab.itc.virginia.edu/wiki/toolbox/example%20httpd.conf%20file.html
+
+# Add these lines to a php file to display errors
+error_reporting(E_ALL); 
+ini_set('display_errors', 'on');
+
+#connect mysql to php
+https://www.w3schools.com/php/php_mysql_select.asp 
+
+# AWS SDK
+# /var/www/html/ec2/aws-sdk-for-php-1.6.2/config.inc.php
+# /var/aws/sdk-1.6.2
