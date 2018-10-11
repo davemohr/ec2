@@ -22,3 +22,17 @@ Load http://PRIVATE-ip:webuiPortNum/ in the proxied browser tab and login.
 # has changed. If Ctrl-C, then starting it again (pointing to the latest public ip) does not work, use these steps to troubleshoot
 ps -ef | grep pem
 kill -9 <pid>
+
+---------------------
+
+# Using X11 to view Remote UI components without any HTML5 or VNC or RDP Desktop
+# The xQuartz.app application on mac provides X11 capability, so launch that and run 
+# the commands below in xQuartz terminal at the bash prompt to launch gedit or Firefox locally:
+
+Bash 3.2$ ssh -CX -i ~/Documents/aws/pem/id_rsa user@host /usr/bin/gedit
+
+Bash 3.2$ ssh -CX -i ~/Documents/aws/pem/id_rsa user@host /usr/bin/firefox
+
+NOTE: On a Windows machine, install Cygwin to get X11 capability
+NOTE: Still need to have the sudo ssh -i ~/id_rsa -p 443 -D 80 -g user@ipaddress port mapping working for the above commands to work.
+
