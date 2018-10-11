@@ -1,0 +1,72 @@
+# build.sh contents
+PACKER_LOG=1
+PACKER_LOG_PATH="packerlog.txt"
+packer build file.json
+7z a -tzip -mx=9 ${VM_PATH}.zip ${VM_PATH}
+
+#JSON file contents (e.g. file.json)
+{
+  "variables": {
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "us-west-1",
+    "source_ami": "ami-blah",
+    "instance_type": "t2.large",
+    "ssh_username": "centos",
+    "ssh_keypair_name": "keypairname",
+    "ssh_password": "",
+    "ssh_timeout": "10000s",
+    "ssh_handshake_attempts": "100",
+    "ssh_pty": "true",
+    "ssh_private_key_file": "/home/centos/foo.pem",
+    "security_group_id": "sg-123",
+    "ami_name": "replace-ami-name",
+    "vpc_id": "vpc-123",
+    "subnet_id": "subnet-123",
+    "associate_public_ip_address": "true",
+    "launch_block_device_mappings": [
+		{
+		  "device_name": "/dev/sda1",
+		  "volume_size": 65,
+		  "volume_type": "gp2",
+		  "delete_on_termination": true
+		}]
+  }],
+  "provisioners": [
+	{
+		"type": "file",
+		"source": "deployments",
+		"destination": "/var/tmp"
+	},
+	{
+		"type": "shell",
+		"pause_before": "10s",
+		"execute_command": "{{ .Vars }} sudo -E -S sh -l '{{ .Path }}'",
+		"scripts": [
+			"provisioners/1.sh"
+		]
+	},	
+	{
+		"type": "shell",
+		"inline": [
+		  "sudo /usr/sbin/reboot"
+		]
+	},	
+	{
+		"type": "shell",
+		"pause_before": "120s",
+		"execute_command": "{{ .Vars }} sudo -E -u training /bin/bash -l '{{ .Path }}'",
+		"scripts": [
+			"provisioners/2.sh"
+		]
+	},
+	{
+		"type": "shell",
+		"pause_before": "60s",
+		"inline": [
+			"sudo /usr/sbin/reboot"
+	  	]
+	}
+  ]
+}
