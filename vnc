@@ -1,0 +1,56 @@
+# Install and Configure VNC Server on the VM (or Amazon instance)
+
+# Install VNC Server. 
+sudo yum install -y tigervnc-server xorg-x11-fonts-Type1
+vncserver 
+# When prompted enter password training
+
+# Set VNC Server to start on boot
+sudo chkconfig vncserver on
+
+# Configure VNC clients to connect on port 5902
+sudo vim /etc/sysconfig/vncservers 
+
+# Uncomment the last two lines and edit as follows 
+VNCSERVERS="2:training"
+VNCSERVERARGS[2]="-geometry 1280x1024"	
+
+# Open TCP port 5902 in the EC2 security group in which the instance is running. 
+# If the instance runs the firewall, add an exception to allow TCP 5902 traffic locally on the instance as well.
+
+# Configure VNC to connec to the gnome desktop
+sudo vim ~/.vnc/xstartup
+# Comment out the last line (twm &)
+# Add this new last line: 
+exec gnome-session
+
+# Restart VNC server
+sudo service vncserver restart
+
+# Connect to VNC Desktop of Amazon Instance from Mac
+# Launch Safari browser and type this in the URL field: vnc://192.169.1.9
+# In the “Connect to Shared Computer” window that appears, type in external-ip:5902 
+# (where external-ip is the actual external IP address of the instance).  
+# Click Connect. When prompted, enter the “training” password. You should be connected to the gnome session.
+
+# Install XRDP
+wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+sudo rpm -Uvh remi-release-6.rpm epel-release-6-8.noarch.rpm
+sudo yum install xrdp
+# Open up tcp port 3389 in the EC2 security group.
+
+# Make the xrdp service start by default as a service. As root, execute this:
+sudo chkconfig --level 345 xrdp on
+
+# Fix an issue where more than 10 different screen resolution/color depth connections to the 
+# desktop since the last reboot does not allow more connections. This bumps that up to 99.
+vi /etc/xrdp/sesman.ini
+# On line 16 change maxSessions to 99
+# Save the change 
+
+# Test Connecting to the Desktop via RDP
+# Launch RDP client and connect to public-ip
+username: training	
+Password: training
+# You should see the Desktop on your Amazon CentOS instance!
