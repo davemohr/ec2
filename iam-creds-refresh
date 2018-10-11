@@ -1,0 +1,28 @@
+# install AWS CLI (only need to be run once)
+curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+unzip awscli-bundle.zip
+sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+
+export PATH=~/.local/bin:$PATH
+# copy template json file and place in working directory
+rm -rf ~/.aws
+mkdir ~/.aws
+cp aws_credentials ~/.aws/credentials
+
+# get latest IAM security file from AWS
+curl http://169.254.169.254/latest/meta-data/iam/security-credentials/ProvisionerRole > newCreds.txt
+
+# remove unwanted characters surrounding security credentials 
+sed -i 's/\"//g' newCreds.txt 
+sed -i 's/,*$//g' newCreds.txt
+
+# configure aws credentials with temporary aws security keys
+accessKeyId=$(awk '/AccessKeyId/{print $NF}' newCreds.txt) 
+secretAccessKey=$(awk '/SecretAccessKey/{print $NF}' newCreds.txt)
+token=$(awk '/Token/{print $NF}' newCreds.txt)
+sed -i '6d' /home/centos/.aws/credentials
+sed -i '6d' /home/centos/.aws/credentials #line 3 becomes line 2
+sed -i '6d' /home/centos/.aws/credentials
+echo "aws_access_key_id="$accessKeyId | tee -a /home/centos/.aws/credentials
+echo "aws_secret_access_key="$secretAccessKey | tee -a /home/centos/.aws/credentials
+echo "aws_session_token="$token | tee -a /home/centos/.aws/credentials
