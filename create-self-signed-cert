@@ -1,0 +1,41 @@
+On the instance, in the users' home dir, create a file named <domainname-without-the-dot-com>.cnf for your domain. 
+This is the contents of an example .cnf which works (update the CN, DNS1 and DNS2 lines as appropriate):
+
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+utf8 = yes
+
+[req_distinguished_name]
+C = US
+ST = CA
+L = City
+O = Company
+OU = Department
+CN = <some.example.com>
+
+[v3_req]
+basicConstraints=CA:TRUE
+keyUsage = keyEncipherment, dataEncipherment, keyCertSign
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+subjectKeyIdentifier = hash
+
+[alt_names]
+DNS.1 = base.example.com
+DNS.2 = *.base.example.com
+
+# Run this command to create the .key and .crt files (update with your crt and cnf file names)
+openssl req -x509 -nodes -sha256 -days 365 -newkey rsa:4096 -keyout domain.key -out foo.crt -config foo.cnf 
+
+# Run this command to verify that the alt names (wildcard support) is in the cert (update with your crt file name):
+openssl x509 -in foo.crt -noout -text
+
+# edit the software's .conf (update the actual names of your crt and key files)
+TLS_ENABLE="true"
+TLS_CERT="/home/dir/foo.crt" 
+TLS_KEY="/home/dir/foo.key"
+# Edit /etc/ssh/sshd_config so that SSH connections are *not* allowed over port 443 (comment out the line).
+# Restart ssh
+sudo service sshd restart
