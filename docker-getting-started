@@ -1,0 +1,37 @@
+# From http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html 
+# Create Docker build/run environment on EC2 instance
+sudo yum update -y
+sudo yum install -y docker
+sudo service docker start
+# add ec2-user linux user to the docker group so don’t need to sudo constantly
+sudo usermod -a -G docker ec2-user
+
+#d ownload a base image
+docker pull centos:6.6
+
+# login to docker repository
+docker login index.docker.io
+
+# This just downloads the files to build a simple app in a container
+sudo yum install -y git
+git clone https://github.com/awslabs/ecs-demo-php-simple-app
+
+# The important file in the downloaded files
+cat Dockerfile
+
+# The build command creates the image
+docker build -t my-dockerhub-username/amazon-ecs-sample .
+# confirm it was created
+docker images
+
+# Run the image
+docker run -p 80:80 my-dockerhub-username/amazon-ecs-sample
+$ docker info
+$ docker images
+$ docker run -i -t cloudera/quickstart /bin/bash
+
+# show containers and their status, ids
+$ docker ps -a
+
+# get a bash connection to a running container
+$ sudo docker exec -it <containerIdOrName> bash
