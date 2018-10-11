@@ -4,6 +4,8 @@ PACKER_LOG_PATH="packerlog.txt"
 packer build file.json
 7z a -tzip -mx=9 ${VM_PATH}.zip ${VM_PATH}
 
+Run $ packer build simple.json
+
 #JSON file contents (e.g. file.json)
 {
   "variables": {
