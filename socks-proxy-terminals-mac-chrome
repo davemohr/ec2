@@ -1,0 +1,24 @@
+# Start a SOCKS proxy for Chrome and connect to cluster web UIs.
+
+# In a new terminal on your laptop, create a SOCKS proxy:
+sudo ssh -i /locationof/foo.pem -p 443 -D 80 -g user@pub-ip
+# when prompted for a password, enter your laptop login password (prompted, because you are using sudo)
+# Leave this terminal process active.
+
+# In another terminal on your laptop, launch a Chrome instance that will use the proxy:
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \ --user-data-dir="$HOME/chrome-with-proxy" \ --proxy-server="socks5://localhost:80"
+# Leave this terminal process active.
+# This will open a new Chrome session. 
+
+# Access the cluster web UIs directly 
+Load http://PRIVATE-ip:webuiPortNum/ in the proxied browser tab and login.
+
+# You will similarly be able to load other web UIs, in the same proxied session 
+# (in the same Chrome tab or in additional tabs spawned from the original proxied Chrome tab)
+
+# Troubleshooting
+# If you have old stale connections, you will need to kill proxy in the first terminal window and restart it. 
+# This typically becomes necessary if you changed networks you are connecting from or if the public IP 
+# has changed. If Ctrl-C, then starting it again (pointing to the latest public ip) does not work, use these steps to troubleshoot
+ps -ef | grep pem
+kill -9 <pid>
