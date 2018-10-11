@@ -1,0 +1,47 @@
+http://jodies.de/ipcalc?host=10.0.0.0&mask1=20&mask2=255.255.255.240 
+
+# From AWS
+http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Appendix_Limits.html
+Max subnets per VPC = 200
+You can assign a single CIDR block to a VPC. 
+The allowed block size is between a /16 netmask and /28 netmask. 
+In other words, the VPC can contain from 16 to 65,536 IP addresses.
+
+When you create a VPC, we recommend that you specify a CIDR block (of /16 or smaller) from the private IPv4 address 
+ranges as specified in RFC 1918:
+10.0.0.0 - 10.255.255.255 (10/8 prefix)
+172.16.0.0 - 172.31.255.255 (172.16/12 prefix)
+192.168.0.0 - 192.168.255.255 (192.168/16 prefix)
+The CIDR block of a subnet - The allowed block size is between a /28 netmask and /16 netmask
+
+VPC with CIDR - 10.10.0.0/16.
+Subnet 1: 10.0.0.0/24
+Subnet 2: 10.0.1.0/24
+Subnet 3: 10.0.2.0/24
+
+From wikipedia
+VPC with CIDR - 10.10.0.0/16. The 16 means 2 to the 16th power, in terms of how many addresses you get 2 
+to the 16th is 65,536 addresses in subnet subnet with /24 CIDR: 10.10.0.0/24. 
+In this case subnet range will be 10.10.0.0/24 to 10.10.255.0/24. So totally you can create 256 subnets with /24 CIDR.
+Each subnet you will get 256 Ip address. But you can only use 251 IP address only (10.10.0.4 to 10.10.0.255). 
+Because Amazon reserves first 4 IPs and Last IP address.
+
+can I create one big 10.0.0.0/16 VPC, and then populate it with lots of /28 subnets which get 16 (11 usable) ip addresses?
+------------
+From stackoverfow
+
+create a VPC with the CIDR range 10.0.0.0/26 which would support up to 64 IPs in the range of 10.0.0.0 - 10.0.0.63.
+Then you could create 4 subnets, each with 16 IPs (11 available for use) using the following VPC CIDR ranges:
+10.0.0.0/28 (10.0.0.0 - 10.0.0.15) --10.0.0.0, 10.0.0.1, 10.0.0.2, 10.0.0.3 not usable
+10.0.0.16/28 (10.0.0.16 - 10.0.0.31) 
+10.0.0.32/28 (10.0.0.32 - 10.0.0.47) 
+10.0.0.48/28 (10.0.0.48 - 10.0.0.63)
+
+From quora
+https://www.quora.com/Can-I-configure-multiple-public-subnets-in-a-single-AWS-VPC 
+Lets assume that we are creating VPC with CIDR - 10.10.0.0/16.
+So i am creating subnet with /24 CIDR: 10.10.0.0/24. In this case subnet range will be 10.10.0.0/24 to 10.10.255.0/24. 
+So totally you can create 256 subnets with /24 CIDR.
+Each subnet you will get 256 Ip address. 
+But you can only use 251 IP address only (10.10.0.4 to 10.10.0.255). Because Amazon reserves first 4 IPs and Last IP address.
+
