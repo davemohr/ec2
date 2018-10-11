@@ -1,0 +1,116 @@
+#!/bin/bash
+podID=$(kubectl get pods -l role=db |grep db | awk '{print $1}')
+echo "podID="$podID
+dockID=$(sudo docker ps | grep $podID | grep entrypoint | awk '{print $1}')
+echo "dockID="$dockID
+sudo docker exec $dockID psql -U postgres -d sense -c 'SELECT id, username, email FROM users'
+
+INSERT INTO auth_user \
+(id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) \
+VALUES ('', '' , '', 0, '', '', '', '', 0, 1, '');
+SET FOREIGN_KEY_CHECKS = 0;
+INSERT INTO auth_user_groups (id, user_id, group_id) SELECT 'VALUES (5,1);
+
+# Get the db pod name:
+$ kubectl get pods
+
+kubectl exec -ti db-39862959-otfg9 -- /bin/bash
+su - postgres 
+psql
+\c sense
+SELECT * FROM site_config;
+SELECT smtp_host, smtp_port, smtp_username, smtp_password, smtp_tls, no_reply_email FROM site_config;
+
+-----------------------------
+# Get the DOCKER container
+$ docker ps | grep db-39862959 #where the db-number is the pod name
+
+# works - where 44eceeeb9618 was returned from the command above
+$ docker exec 44eceeeb9618 psql -U postgres -d sense -c 'SELECT * FROM users'
+
+# Exec into the running container with bash:
+$ kubectl exec -ti db-foo -- /bin/bash
+
+-----------------------------
+
+# Change user to POSTGRES:
+root@db-foo:/# su - postgres
+ 
+# works if you are at the postgres prompt in the kubectl exec env
+psql -d sense -c 'SELECT * FROM users'
+
+# works if you are at the root prompt in the kubectl exec env
+psql -U postgres -d sense -c 'SELECT * FROM users'
+
+# Log in to psql cli:
+$ psql
+
+# show databases
+\l
+
+# use database sense
+\c sense
+
+# show tables (display tables)
+\dt
+
+SELECT * FROM users;
+https://www.tutorialspoint.com/postgresql/postgresql_insert_query.htm 
+
+exit postgress
+\q
+
+psql
+
+# Show roles
+\du
+
+# BACKUP
+#!/bin/bash
+
+echo ""
+echo "Running create-hue-users.sh"
+podID=$(kubectl get pods -l role=db |grep db | awk '{print $1}')
+echo "podID="$podID
+dockID=$(sudo docker ps | grep $podID | grep entrypoint | awk '{print $1}')
+
+echo "dockID="$dockID
+
+hostIP=$(head /etc/agent/config.ini | grep server_host | cut -d '=' -f2)
+echo "host IP="$hostIP
+nocheck="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+#TEST - TO DO: install the training-uswest key so that ssh works
+ssh $nocheck centos@$IP cat /etc/hosts
+
+#write the user table to disk
+sudo docker exec $dockID psql -U postgres -d sense -c 'SELECT id, username, email FROM users' > all-users.txt
+
+#iterate through the users
+COUNTER=$(cat all-users.txt | wc -l)
+x=1
+y=3
+COUNTER=$(( $COUNTER - 2 ))
+ucount=$(( $COUNTER - 2 ))
+echo ""
+echo "Number of users ="$ucount
+echo ""
+echo "--------------------------------"
+while [ $y -le $COUNTER ]
+do 
+ 	#echo "iteration"$x
+	user=$(cat all-users.txt | awk "FNR == $y {print}" | awk '{print $3}' )
+	echo $user
+
+	#check here to see if the user exists
+	#ssh $nocheck centos@$hostIP mysql -u root -ptraining RUN QUERY HERE
+
+
+ 	x=$(( $x + 1 ))
+ 	y=$(( $y + 1 ))
+done
+echo "--------------------------------"
+echo ""
+
+
+
