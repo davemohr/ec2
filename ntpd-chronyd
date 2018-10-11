@@ -1,0 +1,64 @@
+# if you use AWS's ntp service, per https://aws.amazon.com/blogs/aws/keeping-time-with-amazon-time-sync-service/, 
+# could close port 123 in the security group. 
+
+# CentOS 6
+# set which services run or don't run at boot
+sudo chkconfig ntpdate off
+sudo chkconfig ntpd on
+
+# set which services should be running now
+sudo service ntpdate stop
+sudo service ntpd restart	//this is the temp fix if/when a clock offset occurs
+
+# synch with the local clock 
+sudo hwclock --systohc
+
+config file: /etc/ntp.conf
+Another file: /etc/sysconfig/ntpd
+
+#monitor the offset: 
+watch -d -n 3 ntpdc -np
+
+#force an update
+ntpd -gq
+With the -g option the clock will be initially set to the server time regardless of the chip time
+
+--------------------
+# CentOS 7
+# set which services run or don't run at boot
+sudo systemctl disable ntpdate 
+sudo systemctl disable ntpd
+sudo systemctl enable chronyd
+
+# set which services should be running now
+sudo systemctl stop ntpdate 
+sudo systemctl stop ntpd
+sudo systemctl restart chronyd //this is the temp fix if/when a clock offset occurs
+
+config file: /etc/chrony.conf 
+
+#monitor the offset: 
+watch -d -n 3 chronyc sources
+-------------------------
+
+#these notes apply to centos 6 and 7
+# Synchronize the node.
+ntpdate -u <your_ntp_server>
+# Synchronize the system clock (to prevent synchronization problems).
+hwclock --systohc
+
+# If running ntpd
+ntpdc -c iostat 
+# Verifies packets are sent / received between the different peers. 
+ntpq -c as
+# Profiles information about the conditions of each peer. 
+# The output of this command includes the association ID that can be used in combination with 'ntpq -c "rv "'
+# to get more information about the status of each peer. 
+ntpq -c pe
+# Returns a summary of all peers and the reason they are not in use 
+
+# If running chronyd
+chronyc activity
+# to check how many NTP sources are online/offline. 
+chronyc sourcestats
+# Provides more information about the conditions of each peer. To check chrony tracking, issue the command 'chronyc tracking'.
