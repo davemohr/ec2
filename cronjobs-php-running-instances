@@ -1,3 +1,10 @@
+# The service is crond:
+systemctl status crond
+sudo service crond status
+# The file that controls what the service runs:
+/etc/crontab
+
+
 vi /etc/crontab
 # make calls to .sh files from here
 ----------------
