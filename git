@@ -1,0 +1,21 @@
+git status 
+git branch -l -a # shows you what branch you are on and what other branches exist.
+git pull
+git push
+git add 
+git commit <file> -m “comment”
+
+
+git stash
+git pull --rebase
+git stash pop
+git push
+
+#Resolve merge conflict
+edit the file, removing all the cruft
+git add the file
+git commit -i -m 'comment' filename
+git push
+git stash pop (nothing left to pop)
+git pull
+git status (all clean)
