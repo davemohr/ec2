@@ -1,0 +1,32 @@
+# On your mac…
+ssh-keygen -t rsa
+# This will create two files in your (hidden) ~/.ssh directory: id_rsa and id_rsa.pub 
+# Now set permissions on your private key:
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_rsa
+
+# On your instance on EC2
+# Copy the public key (id_rsa.pub) to the remote server and install it to the authorized_keys list:
+cat id_rsa.pub >> ~/.ssh/authorized_keys
+
+# Note: once you've imported the public key, you can delete it from the server.
+# and finally set file permissions on the server:
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+# Once you've checked you can successfully login to the server using your public/private key pair, 
+# you can disable password authentication completely by adding the following setting to your/etc/ssh/sshd_config file:
+# Disable password authentication forcing use of keys
+PasswordAuthentication no
+
+# You should never save the file with its contents starting with 
+# -----BEGIN RSA PRIVATE KEY----- on the server, that is your private key. 
+# Instead, you must put the public key into the ~/.ssh/authorized_keys file.
+# This public key has the .pub extension when generated using ssh-keygen and its contents begin with ssh-rsa AAAAB3.
+
+======
+openssl genrsa -out mykey.pem 1024
+# will actually produce a public - private key pair. The pair is stored in the generated mykey.pem file.
+openssl rsa -in mykey.pem -pubout > mykey.pub
+====
+encrypt with public key 
+decrypt with private key
