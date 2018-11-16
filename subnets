@@ -14,8 +14,9 @@ ranges as specified in RFC 1918:
 192.168.0.0 - 192.168.255.255 (192.168/16 prefix)
 The CIDR block of a subnet - The allowed block size is between a /28 netmask and /16 netmask
 
-VPC with CIDR - 10.10.0.0/16.
-Subnet 1: 10.0.0.0/24
+VPC with CIDR - 10.10.0.0/16 (gives you 65,536 IP address range. The first two octets (10.10....) are frozen,
+but the others are open (256 x 256 = 65,536 possible addresses)
+Subnet 1: 10.0.0.0/24 (here the first 3 octets are frozen, leaving 256 possible IPs)
 Subnet 2: 10.0.1.0/24
 Subnet 3: 10.0.2.0/24
 
