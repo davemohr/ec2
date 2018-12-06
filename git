@@ -1,5 +1,8 @@
 git status 
-git branch -l -a # shows you what branch you are on and what other branches exist.
+git branch -l -a              # shows you what branch you are on and what other branches exist.
+git checkout <remote_path>    # switches to the branch you want
+git checkout master           # return to master branch
+git fetch --prune             # sync my local repository with remote so local repository becomes 100% copy of remote
 git pull
 git push
 git add 
