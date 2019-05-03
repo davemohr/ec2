@@ -59,7 +59,20 @@ aws cloudformation describe-stacks \
 
 
 
-
+#grant list/read privs across servcies.
+Resources:
+  ReadOnlyGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: QLReadOnly
+      ManagedPolicyArns: [ "arn:aws:iam::aws:policy/ReadOnlyAccess" ]
+  GroupAssignment:
+    Type: AWS::IAM::UserToGroupAddition
+    DependsOn: ReadOnlyGroup
+    Properties: 
+      GroupName: QLReadOnly
+      Users:
+        - theuser
 
 
 
