@@ -5,12 +5,51 @@ EC2
 # Find instance when you know the Name of it
 aws ec2 describe-instances \
 --filters "Name=tag:Name,Values='Web Server'" \
---query 'Reservations[].Instances[].[State.Name,PublicIpAddress]'
+--query 'Reservations[].Instances[].[State.Name,PublicIpAddress,InstanceId]'
+
+# Find SG that has port 22 open to 0.0.0.0/0
+aws ec2 describe-security-groups \
+--group-ids $sgId \
+--filters Name=ip-permission.cidr,Values='0.0.0.0/0' Name=ip-permission.to-port,Values=22 \
+--region eu-west-2 \
+--output text
+
+# Find SG ID of instance with given name and assign to variable
+sgId=$( aws ec2 describe-security-groups \
+--filters "Name=tag:Name,Values='WebServerSG'" \
+--query 'SecurityGroups[*].[GroupId]' \
+--output text )
+
+# oepn port 22 in a SG
+aws ec2 authorize-security-group-ingress \
+--group-id $sgId \
+--protocol tcp \
+--port 22 \
+--cidr 0.0.0.0/0 \
+--region eu-west-2
 
 # Latest AMI
 LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+    
+# Create an instance and return the InstanceId.    
+aws ec2 run-instances \
+--key-name $key-name> \
+--instance-type t2.micro \
+--image-id $ami-id \
+--user-data file:///home/ec2-user/UserData.txt \
+--security-group-ids $sgId \
+--subnet-id $subnetId \
+--associate-public-ip-address \
+--tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=MyInstance}]' \
+--output text \
+--query 'Instances[*].InstanceId'
+
+# Create an AMI
+aws ec2 create-image \
+--name MyAMI \
+--instance-id $instancId
 
 ===============
 S3
@@ -48,6 +87,13 @@ aws cloudformation describe-stack-events \
 --stack-name thisStack \
 --query "StackEvents[?ResourceStatus == 'CREATE_FAILED']"
 
+# Update stack
+aws cloudformation update-stack \
+--stack-name myStack \
+--template-body file://template.yaml \
+--capabilities CAPABILITY_NAMED_IAM \
+--parameters ParameterKey=KeyName,ParameterValue=actualKeyName
+
 # Delete stack
 aws cloudformation delete-stack --stack-name thisStack
 
@@ -74,5 +120,13 @@ Resources:
       Users:
         - theuser
 
+===============
+CLOUDTRAIL
+===============
+# After downloading and extracting CT logs to an instance, 
+# run this from the dir they are in to look for security related events
+for i in $(ls); do echo $i ; doc=$(cat $i | grep $ip) ; if [[ "$doc" != "" ]]; then echo $doc | python -m json.tool | grep eventName | grep Security ; fi ; done
 
+# List all the access keys in the account
+for user in $(aws iam list-users --output text --query 'Users[*].UserName'); do aws iam list-access-keys --user $user --output text ; done
 
