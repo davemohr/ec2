@@ -22,3 +22,14 @@ git push
 git stash pop (nothing left to pop)
 git pull
 git status (all clean)
+
+#find all of the .DS_Store files and git remove them
+find . -name .DS_Store -print0 | xargs -0 git rm --ignore-unmatch
+
+#merge dev to prod
+git branch -a
+git status/pull/push, whateve
+git checkout prod
+git merge dev
+git push
+git checkout dev
