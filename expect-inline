@@ -21,3 +21,19 @@ spawn sudo /usr/sbin/update-alternatives --config java
 expect -re \"Enter *\"
 send \"2\r\"
 expect eof"
+
+#another example - set mysql root password
+expect -c "set timeout -1
+spawn sudo mysqld_safe --skip-grant-tables &
+send \"mysql -u root\r\"
+expect -re \"MariaDB *\"
+send \"use mysql;\r\"
+expect -re \"MariaDB *\"
+send \"update user SET PASSWORD=PASSWORD("password") WHERE USER='root';\r\"
+expect -re \"MariaDB *\"
+send \"flush privileges;\r\"
+expect -re \"MariaDB *\"
+send \"exit\r\"
+expect eof"
+sudo systemctl stop mariadb
+sudo systemctl start mariadb
